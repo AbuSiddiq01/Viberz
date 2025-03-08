@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeSeek Music Player</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <h1>VibeSeek Music Player</h1>
+    <input type="text" id="searchInput" placeholder="Search for a song...">
+    <button onclick="searchMusic()">Search</button>
+    <br><br>
+
+    <div id="musicContainer">
+        <h2 id="songTitle"></h2>
+        <img id="thumbnail" width="200">
+        <br>
+        <audio id="audioPlayer" controls preload="auto"></audio> <!-- Preload for faster play -->
+    </div>
+
+    <script>
+        async function searchMusic() {
+            let query = document.getElementById("searchInput").value;
+            let response = await fetch(`/search?q=${query}`);
+
+            if (!response.ok) {
+                console.error("Search failed:", response.statusText);
+                return;
+            }
+
+            let data = await response.json();
+            if (data.error) {
+                console.error("Error:", data.error);
+                return;
+            }
+
+            document.getElementById("songTitle").innerText = data.title;
+            document.getElementById("thumbnail").src = data.thumbnail;
+
+            let audio = document.getElementById("audioPlayer");
+            audio.src = data.audio_url; // Set audio source directly
+            audio.load(); // Preload for faster play
+            audio.play().catch(e => console.error("Playback error:", e));
+        }
+    </script>
+
+</body>
+</html>
